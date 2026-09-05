@@ -1,0 +1,5176 @@
+<<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoFarm DMS</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --ink:#17313d;
+  --muted:#71808a;
+  --line:rgba(176,197,181,.42);
+  --green:#3d914c;
+  --dark:#287c48;
+  --shadow:0 18px 45px rgba(47,74,54,.1)
+}
+
+*{
+  box-sizing:border-box
+}
+
+body{
+  margin:0;
+  min-width:320px;
+  color:var(--ink);
+  font-family:"DM Sans",sans-serif;
+  background-image:url('2.jpg');
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  background-attachment:fixed;
+  -webkit-font-smoothing:antialiased
+}
+
+body.locked{
+  overflow:hidden
+}
+
+button,
+input,
+select{
+  font:inherit
+}
+
+button{
+  cursor:pointer
+}
+
+[hidden]{
+  display:none!important
+}
+
+/* ================================
+   PASSWORD GATE
+   ================================ */
+
+.gate{
+  position:fixed;
+  inset:0;
+  z-index:10;
+  display:grid;
+  place-items:center;
+  padding:24px;
+  background:linear-gradient(rgba(19,50,32,.44),rgba(19,50,32,.44)),url('2.jpg') center/cover no-repeat;
+  backdrop-filter:blur(12px)
+}
+
+.gate-card{
+  width:min(100%,510px);
+  padding:44px;
+  border:1px solid rgba(221,239,218,.56);
+  border-radius:18px;
+  background:rgba(249,253,247,.76);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  box-shadow:0 28px 80px rgba(25,62,37,.24);
+  text-align:center
+}
+
+.gate-logo{
+  display:block;
+  width:64px;
+  height:64px;
+  margin:0 auto 20px;
+  object-fit:contain
+}
+
+.gate h1{
+  margin:0 0 9px;
+  font-family:Manrope,sans-serif;
+  font-size:clamp(25px,5vw,34px);
+  letter-spacing:-1.1px
+}
+
+.gate p{
+  margin:0 0 25px;
+  color:var(--muted);
+  font-size:13px
+}
+
+.gate-form{
+  display:flex;
+  gap:10px
+}
+
+.gate-input{
+  flex:1;
+  min-width:0;
+  height:48px;
+  padding:0 15px;
+  border:1px solid #d1e0d2;
+  border-radius:9px;
+  outline:0;
+  background:#fff;
+  font-size:12px
+}
+
+.button{
+  min-height:44px;
+  padding:0 18px;
+  border:0;
+  border-radius:9px;
+  font-size:12px;
+  font-weight:700
+}
+
+.button.green{
+  color:#fff;
+  background:var(--green);
+  box-shadow:0 8px 16px rgba(61,145,76,.18)
+}
+
+.button.green:disabled{
+  cursor:not-allowed;
+  opacity:.5;
+  box-shadow:none
+}
+
+.gate-input:focus{
+  border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(61,145,76,.14)
+}
+
+.error{
+  min-height:18px;
+  margin:14px 0 0!important;
+  color:#a6463f!important;
+  font-size:11px!important
+}
+
+/* ================================
+   APP
+   ================================ */
+
+.app{
+  display:flex;
+  min-height:100vh;
+  background:rgba(255,255,255,.22)
+}
+
+.sidebar{
+  width:280px;
+  flex:0 0 280px;
+  min-height:100vh;
+  padding:28px 25px;
+  border-right:1px solid rgba(164,190,169,.25);
+  background:rgba(248,251,246,.64);
+  backdrop-filter:blur(8px)
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  padding:0 5px 52px
+}
+
+.brand img{
+  width:112px;
+  height:64px;
+  object-fit:contain
+}
+
+.workspace{
+  margin:0 5px 18px;
+  color:#65766c;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:1px;
+  text-transform:uppercase
+}
+
+.nav{
+  display:grid;
+  gap:4px
+}
+
+.nav button{
+  display:flex;
+  gap:13px;
+  align-items:center;
+  width:100%;
+  padding:12px 14px;
+  border:0;
+  border-radius:9px;
+  color:#204f37;
+  background:rgba(192,216,185,.66);
+  text-align:left;
+  font-size:13px;
+  font-weight:700
+}
+
+.nav-icon{
+  width:16px;
+  text-align:center
+}
+
+.main{
+  width:100%;
+  padding:52px 54px 58px;
+  background:rgba(255,255,255,.61);
+  backdrop-filter:blur(2px)
+}
+
+.topbar{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:24px;
+  margin-bottom:38px
+}
+
+h1{
+  margin:0 0 8px;
+  font-family:Manrope,sans-serif;
+  font-size:clamp(30px,3.4vw,46px);
+  letter-spacing:-1.8px
+}
+
+.subtitle{
+  margin:0;
+  color:var(--muted);
+  font-size:13px
+}
+
+/* ================================
+   FILTERS
+   ================================ */
+
+.filters{
+  display:grid;
+  grid-template-columns:1.55fr 1fr 1fr;
+  gap:32px;
+  margin-bottom:30px;
+  padding:26px 21px 25px;
+  border:1px solid rgba(205,220,206,.58);
+  border-radius:12px;
+  background:rgba(255,255,255,.78);
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(10px)
+}
+
+.field label{
+  display:block;
+  margin:0 0 8px;
+  color:#5d6a73;
+  font-size:11px;
+  font-weight:600
+}
+
+.control-wrap{
+  position:relative;
+  display:flex;
+  align-items:center;
+  height:54px
+}
+
+.control{
+  width:100%;
+  height:54px;
+  padding:0 16px;
+  border:1px solid #dfe6e9;
+  border-radius:9px;
+  outline:0;
+  color:var(--ink);
+  background:rgba(255,255,255,.88);
+  font-size:13px
+}
+
+.control:focus{
+  border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(61,145,76,.12)
+}
+
+input.control{
+  padding-left:42px
+}
+
+select.control{
+  padding-right:48px;
+  appearance:none
+}
+
+.search,
+.chevron{
+  position:absolute;
+  top:50%;
+  z-index:1;
+  width:18px;
+  height:18px;
+  transform:translateY(-50%);
+  display:grid;
+  place-items:center;
+  color:#89969c;
+  font-size:16px;
+  pointer-events:none
+}
+
+.search{
+  left:15px
+}
+
+.chevron{
+  right:15px;
+  font-size:17px
+}
+
+/* ================================
+   DOCUMENT TABLE
+   ================================ */
+
+.table-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding-bottom:16px
+}
+
+.table-title{
+  margin:0;
+  font-family:Manrope,sans-serif;
+  font-size:18px
+}
+
+.count{
+  color:#89969c;
+  font-size:11px
+}
+
+.table-wrap{
+  overflow-x:auto;
+  border:1px solid rgba(205,220,206,.58);
+  border-radius:12px;
+  background:rgba(255,255,255,.9);
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(10px)
+}
+
+table{
+  width:100%;
+  min-width:1340px;
+  border-collapse:collapse
+}
+
+th{
+  height:58px;
+  padding:0 20px;
+  color:#23404a;
+  background:rgba(226,238,223,.77);
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.8px;
+  text-align:left;
+  text-transform:uppercase
+}
+
+td{
+  height:76px;
+  padding:0 20px;
+  border-top:1px solid var(--line);
+  color:#405864;
+  font-size:12px;
+  white-space:nowrap
+}
+
+tbody tr:hover{
+  background:rgba(241,249,239,.75)
+}
+
+.name-button{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:0;
+  border:0;
+  color:var(--ink);
+  background:transparent;
+  font-weight:700;
+  text-align:left
+}
+
+.name-button:hover{
+  color:var(--dark);
+  text-decoration:underline
+}
+
+.file-icon{
+  display:grid;
+  place-items:center;
+  width:32px;
+  height:36px;
+  border-radius:5px;
+  color:#fff;
+  font-size:8px;
+  font-weight:800
+}
+
+.pdf{
+  background:#eb6b62
+}
+
+.word{
+  background:#4e99dc
+}
+
+.excel{
+  background:#51b883
+}
+
+.image{
+  background:#3b9b88
+}
+
+.pill{
+  display:inline-block;
+  padding:5px 8px;
+  border-radius:5px;
+  font-size:10px;
+  font-weight:700
+}
+
+.pdf-pill{
+  color:#d85851;
+  background:#fff0ef
+}
+
+.word-pill{
+  color:#4387c2;
+  background:#eef6fd
+}
+
+.excel-pill{
+  color:#399564;
+  background:#ecfaf2
+}
+
+.image-pill{
+  color:#328372;
+  background:#e9f7f3
+}
+
+.state{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:12px;
+  color:#398d5a;
+  background:#eaf8ef;
+  font-size:10px;
+  font-weight:700
+}
+
+.drive-link{
+  color:var(--dark);
+  font-weight:700;
+  text-decoration:none
+}
+
+.drive-link:hover{
+  text-decoration:underline
+}
+
+.empty{
+  padding:42px;
+  color:var(--muted);
+  text-align:center
+}
+
+/* ================================
+   PREVIEW
+   ================================ */
+
+.preview-backdrop,
+.modal-backdrop{
+  position:fixed;
+  inset:0;
+  display:grid;
+  place-items:center;
+  padding:24px;
+  background:rgba(25,35,44,.36)
+}
+
+.preview-backdrop{
+  z-index:20
+}
+
+.modal-backdrop{
+  z-index:25
+}
+
+.preview-modal{
+  width:min(100%,620px);
+  max-height:calc(100vh - 48px);
+  overflow:auto;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#fff;
+  box-shadow:0 24px 70px rgba(25,35,44,.2)
+}
+
+.preview-head,
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  padding:24px 26px 19px;
+  border-bottom:1px solid var(--line)
+}
+
+.preview-head h2,
+.modal-head h2{
+  margin:0 0 5px;
+  font-family:Manrope,sans-serif;
+  font-size:18px
+}
+
+.preview-head p,
+.modal-head p{
+  margin:0;
+  color:var(--muted);
+  font-size:12px
+}
+
+.close{
+  width:30px;
+  height:30px;
+  border:0;
+  border-radius:5px;
+  color:#849098;
+  background:transparent;
+  font-size:20px
+}
+
+.close:hover{
+  background:#f4f8f3
+}
+
+.preview-body{
+  display:grid;
+  gap:18px;
+  padding:25px 26px 28px
+}
+
+.snapshot{
+  min-height:220px;
+  display:grid;
+  place-items:center;
+  padding:22px;
+  border:1px solid #dce5e8;
+  border-radius:6px;
+  background:#f7fafb
+}
+
+.mock{
+  width:min(100%,360px);
+  min-height:170px;
+  padding:18px;
+  border:1px solid #dce4e7;
+  border-radius:4px;
+  background:#fff;
+  box-shadow:0 8px 20px rgba(35,57,70,.08)
+}
+
+.mock-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:16px;
+  color:var(--ink);
+  font-size:11px;
+  font-weight:700
+}
+
+.mock-lines{
+  display:grid;
+  gap:8px
+}
+
+.mock-line{
+  height:6px;
+  border-radius:3px;
+  background:#e8eef0
+}
+
+.mock-line.short{
+  width:58%
+}
+
+.mock-line.mid{
+  width:78%
+}
+
+.sheet{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:3px;
+  margin-top:12px
+}
+
+.cell{
+  height:18px;
+  border:1px solid #dce9df;
+  background:#f2faf5
+}
+
+.cell.head{
+  background:#d8f0e1
+}
+
+.note{
+  margin:0;
+  padding:11px 13px;
+  border-left:3px solid var(--green);
+  color:#62727a;
+  background:#f1fbfc;
+  font-size:11px;
+  line-height:1.5
+}
+
+.meta{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px 24px
+}
+
+.meta span{
+  display:block;
+  margin-bottom:5px;
+  color:#9aa5aa;
+  font-size:10px;
+  text-transform:uppercase
+}
+
+.meta strong{
+  color:var(--ink);
+  font-size:12px
+}
+
+/* ================================
+   GENERAL MODAL
+   ================================ */
+
+.modal{
+  width:min(100%,560px);
+  max-height:80vh;
+  overflow-y:auto;
+  overflow-x:hidden;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#fff;
+  box-shadow:0 24px 70px rgba(25,35,44,.2)
+}
+
+.modal-form{
+  display:grid;
+  gap:15px;
+  padding:24px 26px 26px
+}
+
+.modal-form label{
+  display:block;
+  margin-bottom:7px;
+  color:#5d6a73;
+  font-size:11px;
+  font-weight:700
+}
+
+.modal-input,
+.modal-select{
+  width:100%;
+  height:42px;
+  padding:0 12px;
+  border:1px solid #dfe6e9;
+  border-radius:8px;
+  outline:0;
+  color:var(--ink);
+  background:#fff;
+  font-size:12px
+}
+
+.modal-input:focus,
+.modal-select:focus{
+  border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(61,145,76,.12)
+}
+
+.modal-input.duplicate-error{
+  border-color:#d9534f;
+  box-shadow:0 0 0 3px rgba(217,83,79,.1)
+}
+
+.modal-input.sequence-valid{
+  border-color:#78b982
+}
+
+.modal-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px
+}
+
+.modal-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:9px;
+  padding-top:16px;
+  border-top:1px solid var(--line)
+}
+
+.button.secondary{
+  color:#52656e;
+  background:#f4f8f3;
+  border:1px solid var(--line)
+}
+
+.row-actions{
+  display:flex;
+  gap:6px
+}
+
+.row-action{
+  padding:7px 9px;
+  border:0;
+  border-radius:6px;
+  color:#52705c;
+  background:#edf6eb;
+  font-size:11px;
+  font-weight:700
+}
+
+.row-action.delete{
+  color:#a24d48;
+  background:#fff0ee
+}
+
+/* ================================
+   SEQUENCE REMINDER
+   ================================ */
+
+.sequence-reminder{
+  display:none;
+  margin-top:8px;
+  padding:10px 12px;
+  border:1px solid #d9ead8;
+  border-radius:8px;
+  color:#287c48;
+  background:#f1faf0;
+  font-size:11px;
+  line-height:1.45
+}
+
+.sequence-reminder.visible{
+  display:block
+}
+
+.sequence-reminder strong{
+  font-weight:800
+}
+
+.sequence-reminder.warning{
+  border-color:#f0d3d0;
+  color:#a6463f;
+  background:#fff7f6
+}
+
+.sequence-help{
+  margin-top:6px;
+  color:#8a969c;
+  font-size:9px
+}
+
+/* ================================
+   MANAGE MAIN FILES
+   ================================ */
+
+.category-list{
+  display:grid;
+  gap:10px;
+  max-height:460px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding-right:2px
+}
+
+.category-list::-webkit-scrollbar{
+  width:6px
+}
+
+.category-list::-webkit-scrollbar-track{
+  background:#f3f7f2;
+  border-radius:6px
+}
+
+.category-list::-webkit-scrollbar-thumb{
+  background:#c5d9c7;
+  border-radius:6px
+}
+
+.category-list::-webkit-scrollbar-thumb:hover{
+  background:#9fbea3
+}
+
+.category-item{
+  display:block;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:#f5faf3;
+  overflow:hidden;
+  min-width:0
+}
+
+.category-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:12px 14px;
+  cursor:pointer;
+  min-width:0
+}
+
+.category-header:hover{
+  background:#edf7eb
+}
+
+.category-title{
+  color:var(--ink);
+  font-size:12px;
+  font-weight:700;
+  overflow-wrap:anywhere
+}
+
+.category-limit{
+  display:block;
+  margin-top:3px;
+  color:#89969c;
+  font-size:10px
+}
+
+.category-arrow{
+  color:var(--green);
+  font-size:14px;
+  transition:transform .2s ease
+}
+
+.category-item.expanded .category-arrow{
+  transform:rotate(180deg)
+}
+
+.category-body{
+  display:none;
+  padding:0 14px 15px;
+  border-top:1px solid var(--line);
+  background:#fff;
+  min-width:0
+}
+
+.category-item.expanded .category-body{
+  display:block
+}
+
+.registered-title{
+  padding:14px 0 9px;
+  color:#557061;
+  font-size:11px;
+  font-weight:800
+}
+
+.registered-activities{
+  max-height:120px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  display:block;
+  margin-bottom:10px;
+  border:1px solid rgba(0,0,0,0.05);
+  padding:5px;
+  border-radius:6px;
+  background:#fff;
+  box-sizing:border-box;
+}
+
+.registered-activities .activity-table{
+  width:100%;
+  min-width:0;
+  border-collapse:collapse;
+  table-layout:fixed
+}
+
+.activity-table{
+  width:100%;
+  min-width:0;
+  border-collapse:collapse
+}
+
+.activity-table th{
+  height:35px;
+  padding:0 9px;
+  color:#567061;
+  background:#edf6eb;
+  font-size:9px
+}
+
+.activity-table td{
+  height:42px;
+  padding:0 9px;
+  border-top:1px solid #e6eee5;
+  font-size:11px;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  word-break:break-word
+}
+
+.registered-activities .activity-table th,
+.registered-activities .activity-table td{
+  overflow-wrap:anywhere;
+  word-break:break-word
+}
+
+.registered-activities::-webkit-scrollbar{
+  width:6px
+}
+
+.registered-activities::-webkit-scrollbar-track{
+  background:#f3f7f2;
+  border-radius:6px
+}
+
+.registered-activities::-webkit-scrollbar-thumb{
+  background:#c5d9c7;
+  border-radius:6px
+}
+
+.registered-activities::-webkit-scrollbar-thumb:hover{
+  background:#9fbea3
+}
+
+.activity-empty{
+  padding:14px 5px;
+  color:#9aa5aa;
+  font-size:10px;
+  text-align:center
+}
+
+.activity-delete{
+  padding:5px 8px;
+  border:0;
+  border-radius:5px;
+  color:#a24d48;
+  background:#fff0ee;
+  font-size:9px;
+  font-weight:700
+}
+
+.activity-edit{
+  padding:5px 8px;
+  border:0;
+  border-radius:5px;
+  color:#52705c;
+  background:#edf6eb;
+  font-size:9px;
+  font-weight:700
+}
+
+.activity-form{
+  display:grid;
+  grid-template-columns:1fr 1.3fr auto;
+  gap:8px;
+  align-items:end;
+  margin-top:14px;
+  padding-top:13px;
+  border-top:1px solid var(--line);
+  min-width:0
+}
+
+.activity-form label{
+  display:block;
+  margin-bottom:6px;
+  color:#687a70;
+  font-size:9px;
+  font-weight:700
+}
+
+.activity-input{
+  width:100%;
+  height:38px;
+  padding:0 9px;
+  border:1px solid #dfe6e9;
+  border-radius:7px;
+  outline:0;
+  color:var(--ink);
+  background:#fff;
+  font-size:10px
+}
+
+.activity-input:focus{
+  border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(61,145,76,.1)
+}
+
+.add-activity{
+  height:38px;
+  padding:0 11px;
+  border:0;
+  border-radius:7px;
+  color:#fff;
+  background:var(--green);
+  font-size:10px;
+  font-weight:700
+}
+
+.category-actions{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  flex-shrink:0
+}
+
+.category-actions button{
+  border:0;
+  border-radius:5px;
+  padding:5px 7px;
+  font-size:10px;
+  font-weight:700
+}
+
+.category-edit{
+  color:var(--dark);
+  background:#e8f3e6
+}
+
+.category-delete{
+  color:#a24d48;
+  background:#fff0ee
+}
+
+/* ================================
+   TOAST
+   ================================ */
+
+.toast{
+  position:fixed;
+  right:24px;
+  bottom:24px;
+  z-index:40;
+  padding:12px 15px;
+  border:1px solid #f0d3d0;
+  border-radius:7px;
+  color:#a6463f;
+  background:#fff7f6;
+  box-shadow:var(--shadow);
+  font-size:12px
+}
+
+.toast[hidden]{
+  display:none!important
+}
+
+/* ================================
+   RESPONSIVE
+   ================================ */
+
+@media(max-width:900px){
+
+  .sidebar{
+    width:210px;
+    flex-basis:210px
+  }
+
+  .main{
+    padding:32px 28px
+  }
+
+  .filters{
+    grid-template-columns:1fr 1fr
+  }
+
+  .field:first-child{
+    grid-column:1/-1
+  }
+
+  .activity-form{
+    grid-template-columns:1fr 1fr
+  }
+
+  .add-activity{
+    grid-column:1/-1
+  }
+}
+
+@media(max-width:620px){
+
+  .gate-form{
+    display:grid
+  }
+
+  .gate-card{
+    padding:36px 22px 30px
+  }
+
+  .app{
+    display:block
+  }
+
+  .sidebar{
+    width:100%;
+    min-height:auto;
+    padding:17px 20px
+  }
+
+  .brand{
+    padding-bottom:18px
+  }
+
+  .workspace{
+    display:none
+  }
+
+  .main{
+    padding:28px 18px
+  }
+
+  .topbar{
+    display:block;
+    margin-bottom:30px
+  }
+
+  .filters{
+    grid-template-columns:1fr;
+    padding:20px
+  }
+
+  .modal-grid{
+    grid-template-columns:1fr
+  }
+
+  .activity-form{
+    grid-template-columns:1fr
+  }
+
+  .add-activity{
+    grid-column:auto
+  }
+
+  .category-header{
+    align-items:flex-start
+  }
+
+  .category-actions{
+    flex-wrap:wrap;
+    justify-content:flex-end
+  }
+}
+</style>
+</head>
+
+<body class="locked">
+
+<!-- ================================
+     PASSWORD GATE
+     ================================ -->
+
+<div class="gate" id="gate">
+
+<section class="gate-card">
+
+<img
+  class="gate-logo"
+  src="logo.jpg"
+  alt="EchoFarm Records logo"
+>
+
+<h1>EchoFarm DMS</h1>
+
+<p>Secure E-Records Portal</p>
+
+<form
+  class="gate-form"
+  id="gateForm"
+>
+
+<input
+  class="gate-input"
+  id="gatePassword"
+  type="password"
+  placeholder="Enter System Password to Access..."
+  autocomplete="current-password"
+  required
+>
+
+<button
+  class="button green"
+  type="submit"
+>
+Access Portal
+</button>
+
+</form>
+
+<p
+  class="error"
+  id="gateError"
+  role="alert"
+></p>
+
+</section>
+
+</div>
+
+
+<!-- ================================
+     MAIN APP
+     ================================ -->
+
+<div
+  class="app"
+  id="app"
+  hidden
+>
+
+<aside class="sidebar">
+
+<div class="brand">
+
+<img
+  src="logo.jpg"
+  alt="EchoFarm logo"
+>
+
+</div>
+
+<p class="workspace">
+Workspace
+</p>
+
+<nav class="nav">
+
+<button type="button">
+
+<span class="nav-icon">
+▦
+</span>
+
+Documents
+
+</button>
+
+
+<button
+  type="button"
+  id="manageFiles"
+>
+
+<span class="nav-icon">
+⚙️
+</span>
+
+Manage Main Files
+
+</button>
+
+</nav>
+
+</aside>
+
+
+<main class="main">
+
+<header class="topbar">
+
+<div>
+
+<h1>
+EchoFarm DMS
+</h1>
+
+<p class="subtitle">
+E-Records Management &amp; Access Portal.
+</p>
+
+</div>
+
+
+<button
+  class="button green"
+  id="addDocument"
+  type="button"
+>
+＋ Add Record
+</button>
+
+</header>
+
+
+<section class="filters">
+
+<div class="field">
+
+<label for="keyword">
+Keywords
+</label>
+
+<div class="control-wrap">
+
+<span class="search">
+⌕
+</span>
+
+<input
+  class="control"
+  id="keyword"
+  type="search"
+  placeholder="Search documents..."
+>
+
+</div>
+
+</div>
+
+
+<div class="field">
+
+<label for="areaFilter">
+Main Files
+</label>
+
+<div class="control-wrap">
+
+<select
+  class="control"
+  id="areaFilter"
+>
+
+<option value="all">
+All main files
+</option>
+
+</select>
+
+<span class="chevron">
+⌄
+</span>
+
+</div>
+
+</div>
+
+
+<div class="field">
+
+<label for="stateFilter">
+State Range
+</label>
+
+<div class="control-wrap">
+
+<select
+  class="control"
+  id="stateFilter"
+>
+
+<option value="all">
+All states
+</option>
+
+<option>
+Active
+</option>
+
+<option>
+Archived
+</option>
+
+</select>
+
+<span class="chevron">
+⌄
+</span>
+
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="table-head">
+
+<h2 class="table-title">
+All documents
+</h2>
+
+<span
+  class="count"
+  id="count"
+></span>
+
+</div>
+
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Name</th>
+<th>Main Files</th>
+<th>Storage Location</th>
+<th>Last Modified</th>
+<th>State Range</th>
+<th>Actions</th>
+
+</tr>
+
+</thead>
+
+<tbody id="rows"></tbody>
+
+</table>
+
+
+<div
+  class="empty"
+  id="empty"
+  hidden
+>
+No documents match these filters.
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+
+<!-- ================================
+     DOCUMENT MODAL
+     ================================ -->
+
+<div
+  class="modal-backdrop"
+  id="documentModal"
+  hidden
+>
+
+<section class="modal">
+
+<header class="modal-head">
+
+<div>
+
+<h2 id="documentModalTitle">
+Add Record
+</h2>
+
+<p>
+Enter the record location metadata.
+</p>
+
+</div>
+
+<button
+  class="close"
+  id="closeDocument"
+  type="button"
+>
+×
+</button>
+
+</header>
+
+
+<form
+  class="modal-form"
+  id="documentForm"
+>
+
+<div>
+
+<label for="docName">
+Name
+</label>
+
+<input
+  class="modal-input"
+  id="docName"
+  required
+>
+
+</div>
+
+
+<div class="modal-grid">
+
+<div>
+
+<label for="docMainFile">
+Main Files
+</label>
+
+<select
+  class="modal-select"
+  id="docMainFile"
+  required
+>
+</select>
+
+</div>
+
+
+<div>
+
+<label for="docState">
+State Range
+</label>
+
+<select
+  class="modal-select"
+  id="docState"
+>
+
+<option>
+Active
+</option>
+
+<option>
+Archived
+</option>
+
+</select>
+
+</div>
+
+</div>
+
+
+<div>
+
+<label for="docKeywords">
+Keywords
+</label>
+
+<input
+  class="modal-input"
+  id="docKeywords"
+  type="text"
+  required
+  placeholder="e.g. meeting, administration, policy"
+>
+
+</div>
+
+
+<div>
+
+<label for="docClass">
+Classification No
+</label>
+
+<input
+  class="modal-input"
+  id="docClass"
+  required
+  placeholder="ECF.100/10/1"
+  autocomplete="off"
+>
+
+<div
+  class="sequence-reminder"
+  id="sequenceReminder"
+>
+  💡 <strong>Next Available Sequence:</strong>
+  <span id="nextSequence"></span>
+</div>
+
+<div class="sequence-help">
+  The next classification number is automatically calculated from existing records under the selected Main File and Activity.
+</div>
+
+</div>
+
+
+<div>
+
+<label for="docActivity">
+Activity Name / Code
+</label>
+
+<select
+  class="modal-select"
+  id="docActivity"
+  required
+>
+
+<option value="">
+Select an activity
+</option>
+
+</select>
+
+</div>
+
+
+<div>
+
+<label for="docType">
+Records Type
+</label>
+
+<input
+  class="modal-input"
+  id="docType"
+  required
+  placeholder="PDF, Word, Excel, Image"
+>
+
+</div>
+
+
+<div>
+
+<label for="docPath">
+Locate Place / Drive Path
+</label>
+
+<input
+  class="modal-input"
+  id="docPath"
+  required
+  placeholder="GD EchoFarm > 100-Administration > 10-Corporate"
+>
+
+</div>
+
+
+<div class="modal-actions">
+
+<button
+  class="button secondary"
+  id="cancelDocument"
+  type="button"
+>
+Cancel
+</button>
+
+<button
+  class="button green"
+  id="saveRecordButton"
+  type="submit"
+>
+Save Record
+</button>
+
+</div>
+
+</form>
+
+</section>
+
+</div>
+
+
+<!-- ================================
+     MANAGE MAIN FILES MODAL
+     ================================ -->
+
+<div
+  class="modal-backdrop"
+  id="categoryModal"
+  hidden
+>
+
+<section class="modal">
+
+<header class="modal-head">
+
+<div>
+
+<h2>
+Manage Main Files
+</h2>
+
+<p>
+Manage main files and their registered activities.
+</p>
+
+</div>
+
+<button
+  class="close"
+  id="closeCategories"
+  type="button"
+>
+×
+</button>
+
+</header>
+
+
+<form
+  class="modal-form"
+  id="categoryForm"
+>
+
+<div
+  class="category-list"
+  id="categoryList"
+></div>
+
+
+<div class="modal-grid">
+
+<div>
+
+<label for="categoryPrefix">
+Prefix Code
+</label>
+
+<input
+  class="modal-input"
+  id="categoryPrefix"
+  placeholder="ECF.400"
+  required
+>
+
+</div>
+
+
+<div>
+
+<label for="categoryName">
+Category Name
+</label>
+
+<input
+  class="modal-input"
+  id="categoryName"
+  placeholder="Human Resources"
+  required
+>
+
+</div>
+
+</div>
+
+
+<div>
+
+<label for="categoryMax">
+Max Sequence Limit
+</label>
+
+<input
+  class="modal-input"
+  id="categoryMax"
+  type="number"
+  min="1"
+  value="100"
+  required
+>
+
+</div>
+
+
+<div class="modal-actions">
+
+<button
+  class="button secondary"
+  id="cancelCategories"
+  type="button"
+>
+Close
+</button>
+
+<button
+  class="button green"
+  type="submit"
+>
+Save Category
+</button>
+
+</div>
+
+</form>
+
+</section>
+
+</div>
+
+
+<!-- ================================
+     PREVIEW MODAL
+     ================================ -->
+
+<div
+  class="preview-backdrop"
+  id="previewBackdrop"
+  hidden
+>
+
+<section
+  class="preview-modal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="previewTitle"
+>
+
+<header class="preview-head">
+
+<div>
+
+<h2 id="previewTitle">
+Document preview
+</h2>
+
+<p>
+Static record snapshot and metadata.
+</p>
+
+</div>
+
+<button
+  class="close"
+  id="closePreview"
+  type="button"
+  aria-label="Close preview"
+>
+×
+</button>
+
+</header>
+
+
+<div class="preview-body">
+
+<div
+  class="snapshot"
+  id="snapshot"
+></div>
+
+
+<p class="note">
+Restricted View: This is a static snapshot of the registered record and its metadata.
+</p>
+
+
+<div class="meta">
+
+<div>
+
+<span>
+Name
+</span>
+
+<strong id="metaName"></strong>
+
+</div>
+
+
+<div>
+
+<span>
+Classification No
+</span>
+
+<strong id="metaClass"></strong>
+
+</div>
+
+
+<div>
+
+<span>
+Activity Ref No
+</span>
+
+<strong id="metaActivity"></strong>
+
+</div>
+
+
+<div>
+
+<span>
+Records Type
+</span>
+
+<strong id="metaType"></strong>
+
+</div>
+
+
+<div>
+
+<span>
+Functional Area
+</span>
+
+<strong id="metaArea"></strong>
+
+</div>
+
+
+<div>
+
+<span>
+Keywords
+</span>
+
+<strong id="metaKeywords"></strong>
+
+</div>
+
+
+<div>
+
+<span>
+Last Modified
+</span>
+
+<strong id="metaDate"></strong>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+</div>
+
+
+<div
+  class="toast"
+  id="toast"
+  hidden
+></div>
+
+
+<!-- ================================
+     PASSWORD SCRIPT
+     ================================ -->
+
+<script>
+
+(()=>{
+
+const gate=
+document.querySelector('#gate');
+
+const app=
+document.querySelector('#app');
+
+const form=
+document.querySelector('#gateForm');
+
+const password=
+document.querySelector('#gatePassword');
+
+const error=
+document.querySelector('#gateError');
+
+
+const unlock=()=>{
+
+gate.hidden=true;
+
+app.hidden=false;
+
+document.body.classList.remove('locked');
+
+};
+
+
+let open=false;
+
+
+try{
+
+open=
+sessionStorage.getItem(
+'portal_unlocked'
+)==='true';
+
+}catch(e){}
+
+
+if(open){
+
+unlock();
+
+}
+
+
+form.addEventListener(
+'submit',
+e=>{
+
+e.preventDefault();
+
+
+/* PASSWORD UPDATED TO ECF2026 */
+
+if(
+password.value==='ECF2026'
+){
+
+try{
+
+sessionStorage.setItem(
+'portal_unlocked',
+'true'
+);
+
+}catch(x){}
+
+
+error.textContent='';
+
+unlock();
+
+
+}else{
+
+password.value='';
+
+error.textContent=
+'Access Denied: Invalid System Password.';
+
+password.focus();
+
+}
+
+}
+);
+
+})();
+
+</script>
+
+
+<!-- ================================
+     MAIN APPLICATION SCRIPT
+     ================================ -->
+
+<script>
+
+/* =========================================================
+   CENTRAL STORAGE KEYS
+   ========================================================= */
+
+const categoryKey=
+'abc_main_files';
+
+const documentKey=
+'abc_documents';
+
+
+/* =========================================================
+   INITIAL DATA SAFETY
+   ========================================================= */
+
+try{
+
+  if(
+    localStorage.getItem(
+      documentKey
+    )===null
+  ){
+
+    localStorage.setItem(
+      documentKey,
+      JSON.stringify([])
+    );
+
+  }
+
+}catch(e){
+
+  console.error(
+    'Unable to initialize document storage:',
+    e
+  );
+
+}
+
+
+try{
+
+  if(
+    localStorage.getItem(
+      categoryKey
+    )===null
+  ){
+
+    localStorage.setItem(
+      categoryKey,
+      JSON.stringify([])
+    );
+
+  }
+
+}catch(e){
+
+  console.error(
+    'Unable to initialize category storage:',
+    e
+  );
+
+}
+
+
+/* =========================================================
+   LOCAL STORAGE
+   ========================================================= */
+
+const loadDocuments=()=>{
+
+  try{
+
+    const stored=
+      localStorage.getItem(documentKey);
+
+    if(stored===null){
+
+      return [];
+
+    }
+
+    const parsed=
+      JSON.parse(stored);
+
+    return Array.isArray(parsed)
+      ?parsed
+      :[];
+
+  }catch(e){
+
+    console.error(
+      'Unable to load documents:',
+      e
+    );
+
+    return [];
+
+  }
+
+};
+
+
+const loadCategories=()=>{
+
+  try{
+
+    const saved=
+      localStorage.getItem(categoryKey);
+
+    if(saved===null){
+
+      return [];
+
+    }
+
+    const parsed=
+      JSON.parse(saved);
+
+    if(!Array.isArray(parsed)){
+
+      return [];
+
+    }
+
+    return parsed.map(category=>({
+
+      ...category,
+
+      activities:
+        Array.isArray(category.activities)
+          ?category.activities
+          :[]
+
+    }));
+
+  }catch(e){
+
+    console.error(
+      'Unable to load categories:',
+      e
+    );
+
+    return [];
+
+  }
+
+};
+
+
+/* =========================================================
+   STATE
+   ========================================================= */
+
+let categories=
+  loadCategories();
+
+let documents=
+  loadDocuments();
+
+
+/* =========================================================
+   SAVE
+   ========================================================= */
+
+const save=()=>{
+
+  try{
+
+    localStorage.setItem(
+      categoryKey,
+      JSON.stringify(categories)
+    );
+
+    localStorage.setItem(
+      documentKey,
+      JSON.stringify(documents)
+    );
+
+  }catch(e){
+
+    console.error(
+      'Unable to save local record state:',
+      e
+    );
+
+    showToast(
+      'Unable to save local record state.'
+    );
+
+  }
+
+};
+
+
+/* =========================================================
+   DOM REFERENCES
+   ========================================================= */
+
+const rows=
+  document.querySelector('#rows');
+
+const areaFilter=
+  document.querySelector('#areaFilter');
+
+const stateFilter=
+  document.querySelector('#stateFilter');
+
+const keyword=
+  document.querySelector('#keyword');
+
+const preview=
+  document.querySelector('#previewBackdrop');
+
+const snapshot=
+  document.querySelector('#snapshot');
+
+const toast=
+  document.querySelector('#toast');
+
+const documentModal=
+  document.querySelector('#documentModal');
+
+const categoryModal=
+  document.querySelector('#categoryModal');
+
+const documentForm=
+  document.querySelector('#documentForm');
+
+const categoryForm=
+  document.querySelector('#categoryForm');
+
+const docMainFile=
+  document.querySelector('#docMainFile');
+
+const docActivity=
+  document.querySelector('#docActivity');
+
+const docClass=
+  document.querySelector('#docClass');
+
+const sequenceReminder=
+  document.querySelector('#sequenceReminder');
+
+const nextSequence=
+  document.querySelector('#nextSequence');
+
+const saveRecordButton=
+  document.querySelector('#saveRecordButton');
+
+
+/* =========================================================
+   CATEGORY EDIT STATE
+   ========================================================= */
+
+let editingCategoryIndex=
+  null;
+
+let editingActivity=
+  null;
+
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+const categoryLabel=
+  c=>
+    `${c.prefix}-${c.name}`;
+
+
+const normalizeCategoryPrefix=
+  value=>
+    String(value||'')
+      .trim()
+      .toUpperCase();
+
+
+const normalizeCategoryName=
+  value=>
+    String(value||'')
+      .trim()
+      .toLowerCase();
+
+
+const getNextActivitySequence=
+  (category,ignoredIndex=null)=>{
+
+    const activities=
+      Array.isArray(category?.activities)
+        ?category.activities
+        :[];
+
+
+    const sequences=
+      activities
+        .filter((_,index)=>index!==ignoredIndex)
+        .map(activity=>
+          Number(
+            String(activity.code||'').split('/')[1]
+          )
+        )
+        .filter(sequence=>Number.isInteger(sequence));
+
+
+    return sequences.length
+      ?Math.max(...sequences)+10
+      :10;
+
+  };
+
+
+const typeClass=
+  t=>
+    String(t||'PDF').toLowerCase();
+
+
+const icon=
+  t=>
+    t==='Excel'
+      ?'XLS'
+      :t==='Word'
+        ?'DOC'
+        :t==='Image'
+          ?'IMG'
+          :'PDF';
+
+
+const showToast=
+  message=>{
+
+    toast.textContent=
+      message;
+
+    toast.hidden=false;
+
+    setTimeout(
+      ()=>toast.hidden=true,
+      3500
+    );
+
+  };
+
+
+/* =========================================================
+   CLASSIFICATION / SEQUENCE HELPERS
+   ========================================================= */
+
+const getActivityCode=
+  activityValue=>{
+
+    return String(activityValue||'')
+      .split(' - ')[0]
+      .trim()
+      .toUpperCase();
+
+  };
+
+
+const normalizeClassification=
+  value=>
+    String(value||'')
+      .trim()
+      .toUpperCase()
+      .replace(/\s+/g,'');
+
+
+const normalizeActivity=
+  value=>
+    String(value||'')
+      .trim()
+      .toLowerCase();
+
+
+const getNextClassification=
+  (
+    area,
+    activityValue,
+    currentId=''
+  )=>{
+
+    const activityCode=
+      getActivityCode(
+        activityValue
+      );
+
+
+    if(
+      !area ||
+      !activityCode
+    ){
+
+      return '';
+
+    }
+
+
+    let highestSequence=
+      0;
+
+
+    documents.forEach(
+      d=>{
+
+        if(
+          d.id===currentId
+        ){
+
+          return;
+
+        }
+
+
+        const sameArea=
+          String(d.area||'')
+            .trim()
+            .toLowerCase()
+          ===
+          String(area||'')
+            .trim()
+            .toLowerCase();
+
+
+        if(!sameArea){
+
+          return;
+
+        }
+
+
+        const storedActivityCode=
+          getActivityCode(
+            d.activity
+          );
+
+
+        if(
+          storedActivityCode.toLowerCase()
+          !==
+          activityCode.toLowerCase()
+        ){
+
+          return;
+
+        }
+
+
+        const classification=
+          normalizeClassification(
+            d.classification
+          );
+
+
+        const escapedActivity=
+          activityCode.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            '\\$&'
+          );
+
+
+        const pattern=
+          new RegExp(
+            '^'+
+            escapedActivity+
+            '\\/(\\d+)$',
+            'i'
+          );
+
+
+        const match=
+          classification.match(
+            pattern
+          );
+
+
+        if(match){
+
+          const sequence=
+            Number(match[1]);
+
+
+          if(
+            Number.isFinite(sequence) &&
+            sequence>highestSequence
+          ){
+
+            highestSequence=
+              sequence;
+
+          }
+
+        }
+
+      }
+    );
+
+
+    return `${activityCode}/${highestSequence+1}`;
+
+  };
+
+
+const isDuplicate=
+  (draft,currentId='')=>{
+
+    const targetArea=
+      String(draft.area||'')
+        .trim()
+        .toLowerCase();
+
+
+    const targetActivity=
+      normalizeActivity(
+        draft.activity
+      );
+
+
+    const targetClassification=
+      normalizeClassification(
+        draft.classification
+      );
+
+
+    if(
+      !targetArea ||
+      !targetActivity ||
+      !targetClassification
+    ){
+
+      return false;
+
+    }
+
+
+    return documents.some(
+      d=>{
+
+        if(
+          d.id===currentId
+        ){
+
+          return false;
+
+        }
+
+
+        return (
+
+          String(d.area||'')
+            .trim()
+            .toLowerCase()
+          ===
+          targetArea
+
+        &&
+
+          normalizeActivity(
+            d.activity
+          )
+          ===
+          targetActivity
+
+        &&
+
+          normalizeClassification(
+            d.classification
+          )
+          ===
+          targetClassification
+
+        );
+
+      }
+    );
+
+  };
+
+
+const updateClassificationState=()=>{
+
+  const area=
+    docMainFile.value;
+
+  const activity=
+    docActivity.value;
+
+  const currentId=
+    documentModal.dataset.id||'';
+
+
+  if(
+    !area ||
+    !activity ||
+    activity.startsWith('No activities')
+  ){
+
+    sequenceReminder.classList.remove(
+      'visible',
+      'warning'
+    );
+
+    nextSequence.textContent='';
+
+    docClass.classList.remove(
+      'duplicate-error',
+      'sequence-valid'
+    );
+
+    saveRecordButton.disabled=false;
+
+    return;
+
+  }
+
+
+  const next=
+    getNextClassification(
+      area,
+      activity,
+      currentId
+    );
+
+
+  if(next){
+
+    sequenceReminder.classList.add(
+      'visible'
+    );
+
+    sequenceReminder.classList.remove(
+      'warning'
+    );
+
+    nextSequence.textContent=
+      next;
+
+  }else{
+
+    sequenceReminder.classList.remove(
+      'visible',
+      'warning'
+    );
+
+    nextSequence.textContent='';
+
+  }
+
+
+  const currentValue=
+    normalizeClassification(
+      docClass.value
+    );
+
+
+  const currentAutoPattern=
+    currentValue &&
+    getActivityCode(activity)
+      ?new RegExp(
+          '^'+
+          getActivityCode(activity)
+            .replace(
+              /[.*+?^${}()|[\]\\]/g,
+              '\\$&'
+            )+
+          '\\/\\d+$',
+          'i'
+        )
+      :null;
+
+
+  if(
+    !currentValue ||
+    (
+      currentAutoPattern &&
+      currentAutoPattern.test(
+        currentValue
+      ) &&
+      (
+        documentModal.dataset.autoSequence==='true'
+        ||
+        documentModal.dataset.id===''
+      )
+    )
+  ){
+
+    docClass.value=
+      next;
+
+    documentModal.dataset.autoSequence=
+      'true';
+
+  }
+
+
+  const draft={
+    area,
+    activity,
+    classification:
+      docClass.value.trim()
+  };
+
+
+  if(
+    isDuplicate(
+      draft,
+      currentId
+    )
+  ){
+
+    docClass.classList.add(
+      'duplicate-error'
+    );
+
+    docClass.classList.remove(
+      'sequence-valid'
+    );
+
+    sequenceReminder.classList.add(
+      'visible',
+      'warning'
+    );
+
+    nextSequence.textContent=
+      next;
+
+
+    saveRecordButton.disabled=
+      true;
+
+  }else{
+
+    docClass.classList.remove(
+      'duplicate-error'
+    );
+
+
+    if(
+      normalizeClassification(
+        docClass.value
+      )===
+      normalizeClassification(
+        next
+      )
+    ){
+
+      docClass.classList.add(
+        'sequence-valid'
+      );
+
+    }else{
+
+      docClass.classList.remove(
+        'sequence-valid'
+      );
+
+    }
+
+
+    saveRecordButton.disabled=
+      false;
+
+  }
+
+};
+
+
+/* =========================================================
+   CATEGORY OPTIONS
+   ========================================================= */
+
+const renderCategoryOptions=()=>{
+
+  const current=
+    areaFilter.value;
+
+
+  areaFilter.innerHTML=
+    '<option value="all">All main files</option>'+
+    categories.map(
+      c=>
+        `<option value="${categoryLabel(c)}">${categoryLabel(c)}</option>`
+    ).join('');
+
+
+  document.querySelector(
+    '#docMainFile'
+  ).innerHTML=
+    categories.length
+
+      ?
+
+      categories.map(
+        c=>
+          `<option value="${categoryLabel(c)}">${categoryLabel(c)}</option>`
+      ).join('')
+
+      :
+
+      '<option value="">No main files registered</option>';
+
+
+  if(
+    categories.some(
+      c=>
+        categoryLabel(c)===current
+    )
+  ){
+
+    areaFilter.value=
+      current;
+
+  }
+
+
+  renderActivityOptions();
+
+};
+
+
+/* =========================================================
+   DYNAMIC ACTIVITY DROPDOWN
+   ========================================================= */
+
+const renderActivityOptions=
+  (selectedValue='')=>{
+
+    const activitySelect=
+      document.querySelector(
+        '#docActivity'
+      );
+
+
+    const mainFileSelect=
+      document.querySelector(
+        '#docMainFile'
+      );
+
+
+    const selectedArea=
+      mainFileSelect.value;
+
+
+    const category=
+      categories.find(
+        c=>
+          categoryLabel(c)===selectedArea
+      );
+
+
+    if(!category){
+
+      activitySelect.innerHTML=
+        '<option value="">No activities registered</option>';
+
+      updateClassificationState();
+
+      return;
+
+    }
+
+
+    const activities=
+      Array.isArray(category.activities)
+        ?category.activities
+        :[];
+
+
+    if(!activities.length){
+
+      activitySelect.innerHTML=
+        '<option value="">No activities registered</option>';
+
+      updateClassificationState();
+
+      return;
+
+    }
+
+
+    activitySelect.innerHTML=
+      '<option value="">Select an activity</option>'+
+      activities.map(
+        activity=>
+          `<option value="${activity.code} - ${activity.name}">
+            ${activity.code} - ${activity.name}
+          </option>`
+      ).join('');
+
+
+    if(selectedValue){
+
+      activitySelect.value=
+        selectedValue;
+
+    }
+
+
+    updateClassificationState();
+
+  };
+
+
+/* =========================================================
+   MANAGE MAIN FILES
+   ========================================================= */
+
+const renderCategories=()=>{
+
+  const list=
+    document.querySelector(
+      '#categoryList'
+    );
+
+
+  if(!categories.length){
+
+    list.innerHTML=`
+
+      <div
+        class="activity-empty"
+        style="
+          padding:28px 10px;
+          border:1px dashed #dfe8df;
+          border-radius:8px;
+          background:#fafdf9;
+        "
+      >
+        No main files registered yet.
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  list.innerHTML=
+    categories.map(
+      (c,i)=>{
+
+        const activities=
+          Array.isArray(c.activities)
+            ?c.activities
+            :[];
+
+
+        return `
+
+          <div
+            class="category-item"
+            data-category-index="${i}"
+          >
+
+            <div
+              class="category-header"
+              data-expand-category="${i}"
+            >
+
+              <div>
+
+                <div class="category-title">
+                  ${categoryLabel(c)}
+                </div>
+
+                <span class="category-limit">
+                  Limit: ${c.max} ·
+                  ${activities.length}
+                  registered activit${activities.length===1?'y':'ies'}
+                </span>
+
+              </div>
+
+
+              <div class="category-actions">
+
+                <button
+                  class="category-edit"
+                  data-category-edit="${i}"
+                  type="button"
+                >
+                  Edit
+                </button>
+
+
+                <button
+                  class="category-delete"
+                  data-category-delete="${i}"
+                  type="button"
+                >
+                  Delete
+                </button>
+
+
+                <span class="category-arrow">
+                  ⌄
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <div
+              class="category-body"
+              data-category-body="${i}"
+            >
+
+              <div class="registered-title">
+                Registered Activities under ${c.name}
+              </div>
+
+
+              ${
+                activities.length
+
+                ?
+
+                `
+
+                <div class="registered-activities">
+
+                  <table class="activity-table">
+
+                    <thead>
+
+                      <tr>
+
+                        <th>
+                          Activity Code
+                        </th>
+
+                        <th>
+                          Activity Name
+                        </th>
+
+                        <th>
+                          Action
+                        </th>
+
+                      </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                      ${activities.map(
+                        (activity,activityIndex)=>`
+
+                          <tr>
+
+                            <td>
+                              <strong>
+                                ${activity.code}
+                              </strong>
+                            </td>
+
+                            <td>
+                              ${activity.name}
+                            </td>
+
+                            <td>
+
+                              <button
+                                class="activity-edit"
+                                type="button"
+                                data-activity-edit="${i}"
+                                data-activity-index="${activityIndex}"
+                              >
+                                Edit
+                              </button>
+
+                              <button
+                                class="activity-delete"
+                                type="button"
+                                data-activity-delete="${i}"
+                                data-activity-index="${activityIndex}"
+                              >
+                                Delete
+                              </button>
+
+                            </td>
+
+                          </tr>
+
+                        `
+                      ).join('')}
+
+                    </tbody>
+
+                  </table>
+
+                </div>
+
+                `
+
+                :
+
+                `
+
+                <div class="activity-empty">
+                  No activities registered under this main file yet.
+                </div>
+
+                `
+              }
+
+
+              <div
+                class="activity-form"
+                data-activity-form="${i}"
+              >
+
+                <div>
+
+                  <label>
+                    Activity Code
+                  </label>
+
+                  <input
+                    class="activity-input"
+                    data-activity-code
+                    placeholder="${c.prefix}/${getNextActivitySequence(c)}"
+                  >
+
+                </div>
+
+
+                <div>
+
+                  <label>
+                    Activity Name
+                  </label>
+
+                  <input
+                    class="activity-input"
+                    data-activity-name
+                    placeholder="Minute Meeting"
+                  >
+
+                </div>
+
+
+                <button
+                  class="add-activity"
+                  type="button"
+                >
+                  ${editingActivity&&editingActivity.categoryIndex===i?'Update Activity':'＋ Add Activity'}
+                </button>
+
+                ${editingActivity&&editingActivity.categoryIndex===i?`
+
+                <button
+                  class="activity-cancel"
+                  type="button"
+                  data-activity-cancel
+                >
+                  Cancel
+                </button>
+
+                `:''}
+
+              </div>
+
+
+            </div>
+
+          </div>
+
+        `;
+
+      }
+    ).join('');
+
+};
+
+
+/* =========================================================
+   MAIN TABLE RENDER
+   ========================================================= */
+
+const render=()=>{
+
+  const q=
+    keyword.value
+      .trim()
+      .toLowerCase();
+
+
+  const area=
+    areaFilter.value;
+
+
+  const state=
+    stateFilter.value;
+
+
+  const filtered=
+    documents.filter(
+      d=>
+
+        (
+          !q ||
+
+          `${d.name} ${d.keywords||''} ${d.classification} ${d.path} ${d.activity}`
+            .toLowerCase()
+            .includes(q)
+        )
+
+        &&
+
+        (
+          area==='all' ||
+          d.area===area
+        )
+
+        &&
+
+        (
+          state==='all' ||
+          d.status===state
+        )
+
+    );
+
+
+  rows.innerHTML=
+    filtered.map(
+      d=>`
+
+        <tr>
+
+          <td>
+
+            <button
+              class="name-button"
+              data-preview="${d.id}"
+              type="button"
+            >
+
+              <span
+                class="file-icon ${typeClass(d.type)}"
+              >
+                ${icon(d.type)}
+              </span>
+
+              ${d.name}
+
+            </button>
+
+          </td>
+
+
+          <td>
+            ${d.area}
+          </td>
+
+
+          <td>
+
+            ${d.path}
+
+            <br>
+
+            <small>
+              Classification No: ${d.classification}
+            </small>
+
+            <br>
+
+            <small>
+              Activity: ${d.activity}
+            </small>
+
+          </td>
+
+
+          <td>
+            ${d.date}
+          </td>
+
+
+          <td>
+
+            <span class="state">
+              ${d.status}
+            </span>
+
+          </td>
+
+
+          <td class="row-actions">
+
+            <button
+              class="row-action"
+              data-edit="${d.id}"
+              type="button"
+            >
+              Edit
+            </button>
+
+
+            <button
+              class="row-action delete"
+              data-delete="${d.id}"
+              type="button"
+            >
+              Delete
+            </button>
+
+          </td>
+
+        </tr>
+
+      `
+    ).join('');
+
+
+  document.querySelector(
+    '#count'
+  ).textContent=
+    `${filtered.length} document${filtered.length===1?'':'s'}`;
+
+
+  document.querySelector(
+    '#empty'
+  ).hidden=
+    filtered.length>0;
+
+};
+
+
+/* =========================================================
+   RECORD ID
+   ========================================================= */
+
+const nextId=()=>
+  `record-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
+
+
+/* =========================================================
+   FILL RECORD FORM
+   ========================================================= */
+
+const fillForm=d=>{
+
+  document.querySelector(
+    '#docName'
+  ).value=
+    d?.name||'';
+
+
+  document.querySelector(
+    '#docMainFile'
+  ).value=
+    d?.area||
+    categoryLabel(categories[0]||{prefix:'',name:''});
+
+
+  renderActivityOptions(
+    d?.activity||''
+  );
+
+
+  document.querySelector(
+    '#docState'
+  ).value=
+    d?.status||'Active';
+
+
+  document.querySelector(
+    '#docKeywords'
+  ).value=
+    d?.keywords||'';
+
+
+  document.querySelector(
+    '#docClass'
+  ).value=
+    d?.classification||'';
+
+
+  document.querySelector(
+    '#docType'
+  ).value=
+    d?.type||'PDF';
+
+
+  document.querySelector(
+    '#docPath'
+  ).value=
+    d?.path||'';
+
+
+  documentModal.dataset.autoSequence=
+    'false';
+
+
+  updateClassificationState();
+
+};
+
+
+/* =========================================================
+   OPEN RECORD MODAL
+   ========================================================= */
+
+const openDocumentModal=d=>{
+
+  documentModal.dataset.id=
+    d?.id||'';
+
+
+  documentModal.dataset.autoSequence=
+    d
+      ?'false'
+      :'true';
+
+
+  document.querySelector(
+    '#documentModalTitle'
+  ).textContent=
+    d
+      ?'Edit Record'
+      :'Add Record';
+
+
+  fillForm(d);
+
+
+  documentModal.hidden=false;
+
+
+  updateClassificationState();
+
+};
+
+
+/* =========================================================
+   CLOSE RECORD MODAL
+   ========================================================= */
+
+const closeDocumentModal=()=>{
+
+  documentModal.hidden=true;
+
+  documentForm.reset();
+
+  delete documentModal.dataset.id;
+
+  delete documentModal.dataset.autoSequence;
+
+  sequenceReminder.classList.remove(
+    'visible',
+    'warning'
+  );
+
+  nextSequence.textContent='';
+
+  docClass.classList.remove(
+    'duplicate-error',
+    'sequence-valid'
+  );
+
+  saveRecordButton.disabled=false;
+
+  renderActivityOptions();
+
+};
+
+
+/* =========================================================
+   PREVIEW
+   ========================================================= */
+
+const layout=d=>
+
+  d.type==='Excel'
+
+    ?
+
+    `
+
+      <div class="mock">
+
+        <div class="mock-title">
+
+          <span class="file-icon excel">
+            XLS
+          </span>
+
+          Excel record snapshot
+
+        </div>
+
+
+        <div class="sheet">
+
+          ${
+            Array.from(
+              {length:20},
+              (_,i)=>
+                `<span class="cell${i<4?' head':''}"></span>`
+            ).join('')
+          }
+
+        </div>
+
+      </div>
+
+    `
+
+    :
+
+    `
+
+      <div class="mock">
+
+        <div class="mock-title">
+
+          <span class="file-icon ${typeClass(d.type)}">
+            ${icon(d.type)}
+          </span>
+
+          ${d.type} record snapshot
+
+        </div>
+
+
+        <div class="mock-lines">
+
+          <span class="mock-line"></span>
+
+          <span class="mock-line mid"></span>
+
+          <span class="mock-line"></span>
+
+          <span class="mock-line short"></span>
+
+        </div>
+
+      </div>
+
+    `;
+
+
+const openPreview=d=>{
+
+  snapshot.innerHTML=
+    layout(d);
+
+
+  document.querySelector(
+    '#metaName'
+  ).textContent=
+    d.name;
+
+
+  document.querySelector(
+    '#metaClass'
+  ).textContent=
+    d.classification;
+
+
+  document.querySelector(
+    '#metaActivity'
+  ).textContent=
+    d.activity;
+
+
+  document.querySelector(
+    '#metaType'
+  ).textContent=
+    d.type;
+
+
+  document.querySelector(
+    '#metaArea'
+  ).textContent=
+    d.area;
+
+
+  document.querySelector(
+    '#metaKeywords'
+  ).textContent=
+    d.keywords||'';
+
+
+  document.querySelector(
+    '#metaDate'
+  ).textContent=
+    d.date;
+
+
+  preview.hidden=false;
+
+};
+
+
+/* =========================================================
+   FILTER LISTENERS
+   ========================================================= */
+
+[
+  keyword,
+  areaFilter,
+  stateFilter
+].forEach(
+  c=>
+
+    c.addEventListener(
+      'input',
+      render
+    )
+);
+
+
+/* =========================================================
+   INITIAL RENDER
+   ========================================================= */
+
+renderCategoryOptions();
+
+renderCategories();
+
+render();
+
+
+/* =========================================================
+   ADD RECORD
+   ========================================================= */
+
+document
+  .querySelector('#addDocument')
+  .addEventListener(
+    'click',
+    ()=>openDocumentModal()
+  );
+
+
+/* =========================================================
+   MANAGE MAIN FILES OPEN
+   ========================================================= */
+
+document
+  .querySelector('#manageFiles')
+  .addEventListener(
+    'click',
+    ()=>{
+
+      /*
+         Always reload the latest saved categories
+         before opening the Manage Main Files modal.
+      */
+
+      categories=
+        loadCategories();
+
+      renderCategories();
+
+      renderCategoryOptions();
+
+      categoryModal.hidden=false;
+
+    }
+  );
+
+
+/* =========================================================
+   CLOSE BUTTONS
+   ========================================================= */
+
+document
+  .querySelector('#closeDocument')
+  .addEventListener(
+    'click',
+    closeDocumentModal
+  );
+
+
+document
+  .querySelector('#cancelDocument')
+  .addEventListener(
+    'click',
+    closeDocumentModal
+  );
+
+
+document
+  .querySelector('#closeCategories')
+  .addEventListener(
+    'click',
+    ()=>{
+
+      categoryModal.hidden=true;
+
+      editingCategoryIndex=null;
+
+      categoryForm.reset();
+
+      document.querySelector(
+        '#categoryMax'
+      ).value=100;
+
+    }
+  );
+
+
+document
+  .querySelector('#cancelCategories')
+  .addEventListener(
+    'click',
+    ()=>{
+
+      categoryModal.hidden=true;
+
+      editingCategoryIndex=null;
+
+      categoryForm.reset();
+
+      document.querySelector(
+        '#categoryMax'
+      ).value=100;
+
+    }
+  );
+
+
+document
+  .querySelector('#closePreview')
+  .addEventListener(
+    'click',
+    ()=>{
+
+      preview.hidden=true;
+
+      snapshot.replaceChildren();
+
+    }
+  );
+
+
+document
+  .querySelector('#previewBackdrop')
+  .addEventListener(
+    'click',
+    e=>{
+
+      if(
+        e.target.id==='previewBackdrop'
+      ){
+
+        document
+          .querySelector('#closePreview')
+          .click();
+
+      }
+
+    }
+  );
+
+
+/* =========================================================
+   MAIN FILE CHANGE
+   ========================================================= */
+
+document
+  .querySelector('#docMainFile')
+  .addEventListener(
+    'change',
+    ()=>{
+
+      documentModal.dataset.autoSequence=
+        'true';
+
+      renderActivityOptions();
+
+    }
+  );
+
+
+/* =========================================================
+   ACTIVITY CHANGE
+   ========================================================= */
+
+document
+  .querySelector('#docActivity')
+  .addEventListener(
+    'change',
+    ()=>{
+
+      documentModal.dataset.autoSequence=
+        'true';
+
+      updateClassificationState();
+
+    }
+  );
+
+
+/* =========================================================
+   CLASSIFICATION LIVE LISTENER
+   ========================================================= */
+
+docClass.addEventListener(
+  'input',
+  ()=>{
+
+    documentModal.dataset.autoSequence=
+      'false';
+
+    updateClassificationState();
+
+  }
+);
+
+
+/* =========================================================
+   TABLE ACTIONS
+   ========================================================= */
+
+rows.addEventListener(
+  'click',
+  e=>{
+
+    const previewButton=
+      e.target.closest(
+        '[data-preview]'
+      );
+
+
+    const editButton=
+      e.target.closest(
+        '[data-edit]'
+      );
+
+
+    const deleteButton=
+      e.target.closest(
+        '[data-delete]'
+      );
+
+
+    if(previewButton){
+
+      const record=
+        documents.find(
+          d=>
+            d.id===
+            previewButton.dataset.preview
+        );
+
+
+      if(record){
+
+        openPreview(record);
+
+      }
+
+    }
+
+
+    if(editButton){
+
+      const record=
+        documents.find(
+          d=>
+            d.id===
+            editButton.dataset.edit
+        );
+
+
+      if(record){
+
+        openDocumentModal(record);
+
+      }
+
+    }
+
+
+    if(deleteButton){
+
+      documents=
+        documents.filter(
+          d=>
+            d.id!==
+            deleteButton.dataset.delete
+        );
+
+
+      save();
+
+      render();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   RECORD FORM SUBMIT
+   ========================================================= */
+
+documentForm.addEventListener(
+  'submit',
+  e=>{
+
+    e.preventDefault();
+
+
+    const draft={
+
+      name:
+        document.querySelector(
+          '#docName'
+        ).value.trim(),
+
+
+      area:
+        document.querySelector(
+          '#docMainFile'
+        ).value,
+
+
+      status:
+        document.querySelector(
+          '#docState'
+        ).value,
+
+
+      keywords:
+        document.querySelector(
+          '#docKeywords'
+        ).value.trim(),
+
+
+      classification:
+        document.querySelector(
+          '#docClass'
+        ).value.trim(),
+
+
+      activity:
+        document.querySelector(
+          '#docActivity'
+        ).value,
+
+
+      type:
+        document.querySelector(
+          '#docType'
+        ).value.trim()
+        ||
+        'PDF',
+
+
+      path:
+        document.querySelector(
+          '#docPath'
+        ).value.trim(),
+
+
+      date:
+        new Date().toLocaleDateString(
+          'en-US',
+          {
+            month:'short',
+            day:'2-digit',
+            year:'numeric'
+          }
+        )
+
+    };
+
+
+    const id=
+      documentModal.dataset.id||'';
+
+
+    if(
+      isDuplicate(
+        draft,
+        id
+      )
+    ){
+
+      saveRecordButton.disabled=true;
+
+      docClass.classList.add(
+        'duplicate-error'
+      );
+
+      sequenceReminder.classList.add(
+        'visible',
+        'warning'
+      );
+
+
+      const next=
+        getNextClassification(
+          draft.area,
+          draft.activity,
+          id
+        );
+
+
+      nextSequence.textContent=
+        next||'';
+
+
+      showToast(
+        'Submission Blocked: This exact Classification Number already exists under this active category.'
+      );
+
+
+      return;
+
+    }
+
+
+    saveRecordButton.disabled=false;
+
+
+    if(id){
+
+      const record=
+        documents.find(
+          d=>
+            d.id===id
+        );
+
+
+      if(record){
+
+        Object.assign(
+          record,
+          draft
+        );
+
+      }
+
+    }
+
+
+    else{
+
+      if(
+        isDuplicate(
+          draft,
+          ''
+        )
+      ){
+
+        saveRecordButton.disabled=true;
+
+        showToast(
+          'Submission Blocked: This exact Classification Number already exists under this active category.'
+        );
+
+        return;
+
+      }
+
+
+      documents.push({
+
+        ...draft,
+
+        id:
+          nextId()
+
+      });
+
+    }
+
+
+    save();
+
+    closeDocumentModal();
+
+    render();
+
+  }
+);
+
+
+/* =========================================================
+   SAVE NEW / EDIT MAIN CATEGORY
+   ========================================================= */
+
+categoryForm.addEventListener(
+  'submit',
+  e=>{
+
+    e.preventDefault();
+
+
+    const prefix=
+      document
+        .querySelector(
+          '#categoryPrefix'
+        )
+        .value
+        .trim()
+        .toUpperCase();
+
+
+    const name=
+      document
+        .querySelector(
+          '#categoryName'
+        )
+        .value
+        .trim();
+
+
+    const max=
+      Number(
+        document.querySelector(
+          '#categoryMax'
+        ).value
+      );
+
+
+    /* =====================================================
+       VALIDATE CATEGORY
+       ===================================================== */
+
+    if(
+      !/^ECF\.\d{3}$/.test(prefix) ||
+      !name ||
+      !max
+    ){
+
+      showToast(
+        'Enter a valid category.'
+      );
+
+      return;
+
+    }
+
+
+    /* =====================================================
+       EDIT EXISTING CATEGORY
+       ===================================================== */
+
+    if(
+      editingCategoryIndex!==null
+    ){
+
+      const current=
+        categories[
+          editingCategoryIndex
+        ];
+
+
+      if(!current){
+
+        editingCategoryIndex=null;
+
+        return;
+
+      }
+
+
+      const duplicate=
+        categories.some(
+          (c,index)=>
+
+            index!==
+            editingCategoryIndex
+
+            &&
+
+            (
+              normalizeCategoryPrefix(c.prefix)===prefix ||
+
+              normalizeCategoryName(c.name)
+              ===
+              normalizeCategoryName(name)
+            )
+
+        );
+
+
+      if(duplicate){
+
+        showToast(
+          'This category already exists.'
+        );
+
+        return;
+
+      }
+
+
+      const previousPrefix=
+        current.prefix;
+
+
+      current.prefix=
+        prefix;
+
+      current.name=
+        name;
+
+      current.max=
+        max;
+
+
+      if(
+        previousPrefix!==prefix &&
+        Array.isArray(current.activities)
+      ){
+
+        current.activities=
+          current.activities.map(
+            activity=>({
+
+              ...activity,
+
+              code:
+                `${prefix}/${String(activity.code||'').split('/')[1]||''}`
+
+            })
+          );
+
+      }
+
+
+      /*
+         Save the edited category immediately.
+      */
+
+      save();
+
+
+      /*
+         Refresh every dependent UI.
+      */
+
+      renderCategoryOptions();
+
+      renderCategories();
+
+      render();
+
+
+      editingCategoryIndex=
+        null;
+
+
+      categoryForm.reset();
+
+      document.querySelector(
+        '#categoryMax'
+      ).value=100;
+
+
+      showToast(
+        'Main file category updated.'
+      );
+
+      return;
+
+    }
+
+
+    /* =====================================================
+       DUPLICATE NEW CATEGORY CHECK
+       ===================================================== */
+
+    if(
+      categories.some(
+        c=>
+          normalizeCategoryPrefix(c.prefix)===prefix
+
+          ||
+
+          normalizeCategoryName(c.name)===normalizeCategoryName(name)
+      )
+    ){
+
+      showToast(
+        'This category already exists.'
+      );
+
+      return;
+
+    }
+
+
+    /* =====================================================
+       NEW CATEGORY
+       ===================================================== */
+
+
+const newCategory={
+
+  prefix:
+    prefix,
+
+  name:
+    name,
+
+  max:
+    max,
+
+  activities:
+    []
+
+};
+
+
+/*
+   Add the new category to current state.
+*/
+
+categories.push(
+  newCategory
+);
+
+
+/*
+   Save the updated categories.
+*/
+
+try{
+
+  localStorage.setItem(
+    categoryKey,
+    JSON.stringify(
+      categories
+    )
+  );
+
+}catch(error){
+
+  console.error(
+    'Unable to save new category:',
+    error
+  );
+
+  /*
+     Roll back in-memory state if
+     LocalStorage fails.
+  */
+
+  categories.pop();
+
+  showToast(
+    'Unable to save main file category.'
+  );
+
+  return;
+
+}
+
+
+/*
+   IMPORTANT:
+   Reload the latest saved categories from
+   LocalStorage before rendering.
+
+   This guarantees that the newly added
+   category appears immediately in the
+   Manage Main Files list.
+*/
+
+categories=
+  loadCategories();
+
+
+/*
+   Immediately refresh Manage Main Files UI.
+*/
+
+renderCategories();
+
+
+/*
+   Refresh Main Files dropdowns.
+*/
+
+renderCategoryOptions();
+
+
+/*
+   Refresh document table.
+*/
+
+render();
+
+
+/*
+   Clear edit state.
+*/
+
+editingCategoryIndex=
+  null;
+
+
+/*
+   Reset category form.
+*/
+
+categoryForm.reset();
+
+document.querySelector(
+  '#categoryMax'
+).value=100;
+
+
+/*
+   Confirmation.
+*/
+
+showToast(
+  `${categoryLabel(newCategory)} successfully added.`
+);
+
+  }
+);
+
+
+/* =========================================================
+   MANAGE MAIN FILES CLICK HANDLER
+   ========================================================= */
+
+document
+  .querySelector('#categoryList')
+  .addEventListener(
+    'click',
+    e=>{
+
+
+      /* ===================================================
+         ADD ACTIVITY
+         =================================================== */
+
+      const addButton=
+        e.target.closest(
+          '.add-activity'
+        );
+
+
+      if(addButton){
+
+        const activityForm=
+          addButton.closest(
+            '[data-activity-form]'
+          );
+
+
+        if(!activityForm){
+
+          return;
+
+        }
+
+
+        const categoryIndex=
+          Number(
+            activityForm.dataset.activityForm
+          );
+
+
+        const category=
+          categories[
+            categoryIndex
+          ];
+
+
+        if(!category){
+
+          return;
+
+        }
+
+
+        const codeInput=
+          activityForm.querySelector(
+            '[data-activity-code]'
+          );
+
+
+        const nameInput=
+          activityForm.querySelector(
+            '[data-activity-name]'
+          );
+
+
+        const activities=
+          Array.isArray(category.activities)
+            ?category.activities
+            :[];
+
+
+        category.activities=
+          activities;
+
+
+        const code=
+          codeInput.value
+            .trim()
+            .toUpperCase();
+
+
+        const name=
+          nameInput.value.trim();
+
+
+        const editingIndex=
+          editingActivity&&
+          editingActivity.categoryIndex===categoryIndex
+            ?editingActivity.activityIndex
+            :null;
+
+
+        const activityRegex=
+          /^ECF\.\d{3}\/\d+$/;
+
+
+        if(
+          !activityRegex.test(code)
+        ){
+
+          showToast(
+            'Invalid Activity Code: Use format ECF.100/10.'
+          );
+
+          return;
+
+        }
+
+
+        if(
+          !code.startsWith(
+            category.prefix+'/'
+          )
+        ){
+
+          showToast(
+            `Invalid Activity Code: This activity must begin with ${category.prefix}/`
+          );
+
+          return;
+
+        }
+
+
+        if(!name){
+
+          showToast(
+            'Please enter an Activity Name.'
+          );
+
+          return;
+
+        }
+
+
+        if(
+          activities.some(
+            (a,index)=>
+              index!==editingIndex &&
+              normalizeCategoryPrefix(a.code)===
+              normalizeCategoryPrefix(code)
+          )
+        ){
+
+          showToast(
+            'This activity code already exists under this main file.'
+          );
+
+          return;
+
+        }
+
+
+        if(
+          activities.some(
+            (a,index)=>
+              index!==editingIndex &&
+              normalizeCategoryName(a.name)===
+              normalizeCategoryName(name)
+          )
+        ){
+
+          showToast(
+            'This activity name already exists under this main file.'
+          );
+
+          return;
+
+        }
+
+
+        const sequence=
+          Number(
+            code.split('/')[1]
+          );
+
+
+        if(
+          !Number.isInteger(sequence) ||
+          sequence<10 ||
+          sequence>100 ||
+          sequence%10!==0
+        ){
+
+          showToast(
+            'Activity sequence must use 10, 20, 30 through 100.'
+          );
+
+          return;
+
+        }
+
+
+        if(
+          editingIndex===null &&
+          sequence!==getNextActivitySequence(category)
+        ){
+
+          showToast(
+            `Next Activity Code must be ${category.prefix}/${getNextActivitySequence(category)}.`
+          );
+
+          return;
+
+        }
+
+
+        if(
+          sequence>
+          Number(category.max)
+        ){
+
+          showToast(
+            `Activity sequence cannot exceed the Max Sequence Limit of ${category.max}.`
+          );
+
+          return;
+
+        }
+
+
+        if(editingIndex===null){
+
+          activities.push({
+
+            code,
+            name
+
+          });
+
+        }else{
+
+          activities[editingIndex]={
+
+            code,
+            name
+
+          };
+
+        }
+
+
+        editingActivity=null;
+
+
+        save();
+
+        renderCategories();
+
+        renderActivityOptions();
+
+
+        const newItem=
+          document.querySelector(
+            `.category-item[data-category-index="${categoryIndex}"]`
+          );
+
+
+        if(newItem){
+
+          newItem.classList.add(
+            'expanded'
+          );
+
+        }
+
+
+        const newForm=
+          document.querySelector(
+            `.activity-form[data-activity-form="${categoryIndex}"]`
+          );
+
+
+        if(newForm){
+
+          newForm.querySelector(
+            '[data-activity-code]'
+          ).value='';
+
+
+          newForm.querySelector(
+            '[data-activity-name]'
+          ).value='';
+
+        }
+
+
+        showToast(
+          editingIndex===null
+            ?'Activity successfully registered.'
+            :'Activity successfully updated.'
+        );
+
+
+        return;
+
+      }
+
+
+      /* ===================================================
+         EDIT ACTIVITY
+         =================================================== */
+
+      const activityEdit=
+        e.target.closest(
+          '[data-activity-edit]'
+        );
+
+
+      if(activityEdit){
+
+        e.preventDefault();
+
+        e.stopPropagation();
+
+        const categoryIndex=
+          Number(
+            activityEdit.dataset.activityEdit
+          );
+
+
+        const activityIndex=
+          Number(
+            activityEdit.dataset.activityIndex
+          );
+
+
+        const category=
+          categories[categoryIndex];
+
+
+        const activity=
+          category&&
+          Array.isArray(category.activities)
+            ?category.activities[activityIndex]
+            :null;
+
+
+        if(!activity){
+
+          return;
+
+        }
+
+
+        editingActivity={
+          categoryIndex,
+          activityIndex
+        };
+
+
+        renderCategories();
+
+
+        const item=
+          document.querySelector(
+            `.category-item[data-category-index="${categoryIndex}"]`
+          );
+
+
+        if(item){
+
+          item.classList.add(
+            'expanded'
+          );
+
+        }
+
+
+        const form=
+          document.querySelector(
+            `.activity-form[data-activity-form="${categoryIndex}"]`
+          );
+
+
+        if(form){
+
+          form.querySelector(
+            '[data-activity-code]'
+          ).value=activity.code;
+
+
+          form.querySelector(
+            '[data-activity-name]'
+          ).value=activity.name;
+
+        }
+
+
+        return;
+
+      }
+
+
+      /* ===================================================
+         CANCEL ACTIVITY EDIT
+         =================================================== */
+
+      const activityCancel=
+        e.target.closest(
+          '[data-activity-cancel]'
+        );
+
+
+      if(activityCancel){
+
+        editingActivity=null;
+
+        renderCategories();
+
+        return;
+
+      }
+
+
+      /* ===================================================
+         EXPAND CATEGORY
+         =================================================== */
+
+      const header=
+        e.target.closest(
+          '[data-expand-category]'
+        );
+
+
+      if(
+        header &&
+
+        !e.target.closest(
+          '[data-category-edit]'
+        ) &&
+
+        !e.target.closest(
+          '[data-category-delete]'
+        )
+      ){
+
+        const index=
+          Number(
+            header.dataset.expandCategory
+          );
+
+
+        const item=
+          document.querySelector(
+            `.category-item[data-category-index="${index}"]`
+          );
+
+
+        if(item){
+
+          item.classList.toggle(
+            'expanded'
+          );
+
+        }
+
+
+        return;
+
+      }
+
+
+      /* ===================================================
+         DELETE MAIN CATEGORY
+         =================================================== */
+
+      const del=
+        e.target.closest(
+          '[data-category-delete]'
+        );
+
+
+      if(del){
+
+        e.preventDefault();
+
+        e.stopPropagation();
+
+        const index=
+          Number(
+            del.dataset.categoryDelete
+          );
+
+
+        categories=
+          categories.filter(
+            (_,i)=>
+              i!==index
+          );
+
+
+        editingActivity=null;
+
+
+        save();
+
+
+        renderCategoryOptions();
+
+        renderCategories();
+
+        render();
+
+
+        showToast(
+          'Main file category deleted.'
+        );
+
+        return;
+
+      }
+
+
+      /* ===================================================
+         EDIT MAIN CATEGORY
+         =================================================== */
+
+      const edit=
+        e.target.closest(
+          '[data-category-edit]'
+        );
+
+
+      if(edit){
+
+        e.preventDefault();
+
+        e.stopPropagation();
+
+        const index=
+          Number(
+            edit.dataset.categoryEdit
+          );
+
+
+        const c=
+          categories[index];
+
+
+        if(c){
+
+          editingActivity=null;
+
+          document.querySelector(
+            '#categoryPrefix'
+          ).value=
+            c.prefix;
+
+
+          document.querySelector(
+            '#categoryName'
+          ).value=
+            c.name;
+
+
+          document.querySelector(
+            '#categoryMax'
+          ).value=
+            c.max;
+
+
+          editingCategoryIndex=
+            index;
+
+
+          showToast(
+            'Edit the category details and save.'
+          );
+
+        }
+
+
+        return;
+
+      }
+
+
+      /* ===================================================
+         DELETE ACTIVITY
+         =================================================== */
+
+      const activityDelete=
+        e.target.closest(
+          '[data-activity-delete]'
+        );
+
+
+      if(activityDelete){
+
+        e.preventDefault();
+
+        e.stopPropagation();
+
+        const categoryIndex=
+          Number(
+            activityDelete.dataset.activityDelete
+          );
+
+
+        const activityIndex=
+          Number(
+            activityDelete.dataset.activityIndex
+          );
+
+
+        const category=
+          categories[
+            categoryIndex
+          ];
+
+
+        if(!category){
+
+          return;
+
+        }
+
+
+        category.activities.splice(
+          activityIndex,
+          1
+        );
+
+
+        if(
+          editingActivity&&
+          editingActivity.categoryIndex===categoryIndex
+        ){
+
+          editingActivity=null;
+
+        }
+
+
+        save();
+
+        renderCategories();
+
+        renderActivityOptions();
+
+
+        showToast(
+          'Activity deleted.'
+        );
+
+        return;
+
+      }
+
+    }
+  );
+
+
+/* =========================================================
+   FINAL RENDER
+   ========================================================= */
+
+renderCategoryOptions();
+
+renderCategories();
+
+render();
+
+</script>
+
+</body>
+</html>
